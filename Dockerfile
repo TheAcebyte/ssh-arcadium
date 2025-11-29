@@ -4,12 +4,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libboost-system-dev \
-    libboost-thread-dev 
+    zip \
+    unzip \
+    tar \
+    curl \
+    pkg-config \
+    git
 
 WORKDIR /build
 
 COPY src/ ./src/
+COPY vcpkg.json .
 COPY Makefile .
 
 RUN make -s all

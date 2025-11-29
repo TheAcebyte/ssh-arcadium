@@ -3,4 +3,4 @@ X11Forwarding no
 Match User player
   PasswordAuthentication yes
   PermitEmptyPasswords yes
-  ForceCommand /opt/arcadium/bin/main
+  ForceCommand /opt/arcadium/bin/launcher

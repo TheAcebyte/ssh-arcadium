@@ -1,0 +1,7 @@
+{
+  "name": "ssh-arcadium",
+  "dependencies": [
+    "ftxui",
+    "boost-asio"
+  ]
+}
