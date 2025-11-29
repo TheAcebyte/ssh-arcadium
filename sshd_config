@@ -1,0 +1,4 @@
+Match User player
+  PasswordAuthentication yes
+  PermitEmptyPasswords yes
+  ForceCommand /opt/arcadium/bin/main
