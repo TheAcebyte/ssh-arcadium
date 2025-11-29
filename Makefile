@@ -17,16 +17,16 @@ OBJS = $(MAIN_OBJS)
 all: dirs $(BINS)
 
 dirs:
-	@mkdir -p $(BIN_DIR)
-	@mkdir -p $(BUILD_DIR)
+	mkdir -p $(BIN_DIR)
+	mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(MAIN_BIN): $(MAIN_OBJS)
-	@$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
 clean:
-	@rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rf $(BUILD_DIR) $(BIN_DIR)
 
 -include $(OBJS:.o=.d)

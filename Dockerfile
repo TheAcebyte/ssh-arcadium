@@ -12,7 +12,7 @@ WORKDIR /build
 COPY src/ ./src/
 COPY Makefile .
 
-RUN make all
+RUN make -s all
 
 FROM ubuntu:22.04
 
@@ -43,7 +43,5 @@ RUN mkdir -p /run/sshd
 
 COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-EXPOSE 22
 
 ENTRYPOINT ["/entrypoint.sh"]
