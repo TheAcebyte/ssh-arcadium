@@ -10,19 +10,22 @@ SRC_DIR = src
 BUILD_DIR = build
 BIN_DIR = bin
 
+SHARED_SRCS = $(wildcard $(SRC_DIR)/shared/*/*.cpp)
+SHARED_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SHARED_SRCS))
+
 LAUNCHER_SRCS = $(wildcard $(SRC_DIR)/launcher/*.cpp)
 LAUNCHER_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(LAUNCHER_SRCS))
 LAUNCHER_BIN = $(BIN_DIR)/launcher
 
 BINS = $(LAUNCHER_BIN)
-OBJS = $(LAUNCHER_OBJS)
+OBJS = $(SHARED_OBJS) $(LAUNCHER_OBJS)
 
-.PHONY: all dirs vcpkg-install clean clean-all compile_commands.json
+.PHONY: all dirs vcpkg-install clean clean-all
 
 all: vcpkg-install dirs $(BINS)
 
 vcpkg-install:
-	@if [ ! -d "$(VCPKG_ROOT)" ]; then \
+	if [ ! -d "$(VCPKG_ROOT)" ]; then \
 		git clone https://github.com/microsoft/vcpkg.git $(VCPKG_ROOT); \
 		$(VCPKG_ROOT)/bootstrap-vcpkg.sh; \
 	fi
@@ -32,11 +35,12 @@ dirs:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/launcher
+	mkdir -p $(BUILD_DIR)/shared/text-cycler
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(LAUNCHER_BIN): $(LAUNCHER_OBJS)
+$(LAUNCHER_BIN): $(LAUNCHER_OBJS) $(SHARED_OBJS)
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 clean:

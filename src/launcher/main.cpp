@@ -2,6 +2,6 @@
 
 int main() {
   Launcher launcher;
-  launcher.start();
+  launcher.render();
   return 0;
 }

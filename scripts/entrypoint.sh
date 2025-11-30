@@ -10,7 +10,7 @@ ngrok tcp 22 &
 
 sleep 3
 
-NGROK_URL=$(curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*' | grep -o 'tcp://[^"]*' | head -n 1)
+NGROK_URL=$(curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"' | grep -o 'tcp://[^"]*' | head -n 1)
 
 if [ -n "$NGROK_URL" ]; then
     HOST=$(echo $NGROK_URL | sed 's|tcp://||' | cut -d: -f1)
