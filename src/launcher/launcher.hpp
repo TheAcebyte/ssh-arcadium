@@ -2,32 +2,22 @@
 
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/screen_interactive.hpp"
-#include "shared/block-canvas/block-canvas.hpp"
-#include <string>
-
-using namespace ftxui;
+#include "launcher-ui.hpp"
 
 class Launcher {
 private:
-  enum class Tab {
-    PROMPT,
-    MENU,
-  };
+  ScreenInteractive screen = ScreenInteractive::Fullscreen();
+  LauncherTab tab = LauncherTab::PROMPT;
+  LauncherUI ui;
 
-  ScreenInteractive screen;
-
-  Tab tab = Tab::PROMPT;
-  int tabIndex;
-
+  std::string content;
   std::string username;
-
-  void setTab(Tab tab);
   void generateUsername();
-  BlockCanvas getSnake();
-  Component createPrompt();
-  Component createMenu();
+
+  Component createComponent();
+  void addEventHandlers(Component &component);
 
 public:
   Launcher();
-  void render();
+  void run();
 };

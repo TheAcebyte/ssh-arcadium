@@ -17,6 +17,10 @@ LAUNCHER_SRCS = $(wildcard $(SRC_DIR)/launcher/*.cpp)
 LAUNCHER_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(LAUNCHER_SRCS))
 LAUNCHER_BIN = $(BIN_DIR)/launcher
 
+SNAKE_CLIENT_SRCS = $(wildcard $(SRC_DIR)/snake/client/*.cpp)
+SNAKE_CLIENT_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SNAKE_CLIENT_SRCS))
+SNAKE_CLIENT_BIN = $(BIN_DIR)/snake/client
+
 BINS = $(LAUNCHER_BIN)
 OBJS = $(SHARED_OBJS) $(LAUNCHER_OBJS)
 
@@ -32,17 +36,23 @@ vcpkg-install:
 	cd $(VCPKG_ROOT) && ./vcpkg install --x-manifest-root=$(CURDIR)
 
 dirs:
-	mkdir -p $(BIN_DIR)
 	mkdir -p $(BUILD_DIR)
-	mkdir -p $(BUILD_DIR)/launcher
 	mkdir -p $(BUILD_DIR)/shared
 	mkdir -p $(BUILD_DIR)/shared/block-canvas
 	mkdir -p $(BUILD_DIR)/shared/text-cycler
+	mkdir -p $(BUILD_DIR)/launcher
+	mkdir -p $(BUILD_DIR)/snake
+	mkdir -p $(BUILD_DIR)/snake/client
+	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/snake
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(LAUNCHER_BIN): $(LAUNCHER_OBJS) $(SHARED_OBJS)
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+$(SNAKE_CLIENT_BIN): $(SNAKE_CLIENT_OBJS) $(SHARED_OBJS)
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 clean:

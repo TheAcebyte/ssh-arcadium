@@ -11,11 +11,11 @@ TextCycler::TextCycler(ScreenInteractive &screen, int delay,
                        std::initializer_list<std::string> list) {
   assert(delay > 0);
   std::vector<std::string> values(list);
-  isRunning = true;
+  running = true;
 
   thread = std::thread([this, &screen, delay, values] {
     int index = 0;
-    while (isRunning) {
+    while (running) {
       index = (index + 1) % values.size();
       value = values[index];
       screen.PostEvent(Event::Custom);
@@ -25,7 +25,7 @@ TextCycler::TextCycler(ScreenInteractive &screen, int delay,
 }
 
 TextCycler::~TextCycler() {
-  isRunning = false;
+  running = false;
   if (thread.joinable()) {
     thread.join();
   }
@@ -36,8 +36,7 @@ std::string TextCycler::getValue() const { return value; }
 std::shared_ptr<TextCycler>
 TextCycler::createCycler(ScreenInteractive &screen, int delay,
                          std::initializer_list<std::string> list) {
-  return std::make_shared<TextCycler>(screen, delay,
-                                      std::initializer_list<std::string>(list));
+  return std::make_shared<TextCycler>(screen, delay, list);
 }
 
 std::shared_ptr<TextCycler>

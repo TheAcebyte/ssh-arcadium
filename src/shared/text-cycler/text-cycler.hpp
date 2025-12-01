@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ftxui/component/screen_interactive.hpp"
+#include <atomic>
 #include <initializer_list>
 #include <memory>
 #include <string>
@@ -10,7 +11,7 @@ using namespace ftxui;
 
 class TextCycler {
 private:
-  bool isRunning;
+  std::atomic<bool> running;
   std::thread thread;
   std::string value;
 
