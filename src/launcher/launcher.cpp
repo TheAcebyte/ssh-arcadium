@@ -3,6 +3,7 @@
 #include "ftxui/component/component_options.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
+#include "shared/block-canvas/block-canvas.hpp"
 #include "shared/random.hpp"
 #include "shared/text-cycler/text-cycler.hpp"
 #include "shared/types.hpp"
@@ -28,14 +29,11 @@ void Launcher::generateUsername() {
 }
 
 void Launcher::render() {
-  auto container = Container::Tab({getPrompt(), getMenu()}, &tabIndex);
-  auto renderer =
-      Renderer(container, [container] { return container->Render(); });
-
+  auto container = Container::Tab({createPrompt(), createMenu()}, &tabIndex);
   screen.Loop(container);
 }
 
-Component Launcher::getPrompt() {
+Component Launcher::createPrompt() {
   static std::string content;
 
   InputOption options = InputOption::Default();
@@ -49,28 +47,29 @@ Component Launcher::getPrompt() {
   };
 
   auto input = Input(&content, username, options);
-  auto component = Container::Vertical({input});
   auto ellipsis = TextCycler::createEllipsis1(screen);
-  auto renderer = Renderer(component, [input, ellipsis] {
-    return vbox(
-               window(hbox(filler(), text(" What's your username? "), filler()),
-                      vbox(separatorEmpty(),
-                           hbox(separatorEmpty(), separatorEmpty(),
-                                input->Render(), separatorEmpty(),
-                                separatorEmpty()),
-                           separatorEmpty()),
-                      LIGHT),
-               separatorEmpty(),
-               hbox(text("Press ENTER to continue"),
-                    text(ellipsis->getValue())) |
-                   hcenter) |
+  auto component = Renderer(input, [input, ellipsis] {
+    return vbox(window(text(" What's your username? "),
+                       vbox(separatorEmpty(),
+                            hbox(separatorEmpty(), separatorEmpty(),
+                                 input->Render(), separatorEmpty(),
+                                 separatorEmpty()),
+                            separatorEmpty()),
+                       LIGHT),
+                separatorEmpty(),
+                hbox(text("Press "), text("ENTER") | color(Color::GreenYellow),
+                     text(" to continue"), text(ellipsis->getValue())) |
+                    hcenter) |
            size(WIDTH, EQUAL, 70) | center | color(Color::Green1) |
            bgcolor(Color::Grey3);
   });
 
-  renderer |= CatchEvent([this](Event event) {
+  component |= CatchEvent([this](Event event) {
     if (event == Event::Return) {
-      username = content;
+      if (!content.empty()) {
+        username = content;
+      }
+
       setTab(Tab::MENU);
       return true;
     }
@@ -78,11 +77,57 @@ Component Launcher::getPrompt() {
     return event.is_character() && content.length() >= 16;
   });
 
-  return renderer;
+  return component;
 }
 
-Component Launcher::getMenu() {
-  auto renderer =
-      Renderer([this] { return hbox(text("Welcome ahoy, "), text(username)); });
-  return renderer;
+BlockCanvas Launcher::getSnake() {
+  auto snake = BlockCanvas(5, 5, Color::Grey3);
+  snake.fill(0, 2, Color::DarkOliveGreen3);
+  snake.fill(1, 2, Color::DarkGreen);
+  snake.fill(2, 2, Color::DarkGreen);
+  snake.fill(2, 1, Color::DarkGreen);
+  snake.fill(2, 0, Color::DarkGreen);
+  snake.fill(3, 0, Color::DarkGreen);
+  snake.fill(4, 0, Color::DarkGreen);
+  snake.fill(4, 1, Color::DarkGreen);
+  snake.fill(4, 2, Color::DarkGreen);
+  snake.fill(4, 3, Color::DarkGreen);
+  snake.fill(4, 4, Color::DarkGreen);
+  return snake;
+}
+
+Component Launcher::createMenu() {
+  auto snake = getSnake();
+  auto ellipsis = TextCycler::createEllipsis1(screen);
+  auto component = Renderer([snake, ellipsis](bool) {
+    return vbox(hbox(text("SSH Arcadium")) | hcenter | borderLight, filler(),
+                window(text(" Snake "),
+                       vbox(filler(), canvas(&snake) | hcenter, filler(),
+                            text("0/10 players") | hcenter),
+                       LIGHT) |
+                    size(WIDTH, EQUAL, 50) | size(HEIGHT, EQUAL, 14) | hcenter,
+                separatorEmpty(), filler(),
+                hbox(hbox(text("ENTER") | color(Color::GreenYellow),
+                          text(" - Play")),
+                     filler(),
+                     hbox(text("s") | color(Color::GreenYellow),
+                          text(" - Settings")),
+                     filler(),
+                     hbox(text("q") | color(Color::GreenYellow),
+                          text(" - Quit"))) |
+                    size(WIDTH, EQUAL, 50) | hcenter) |
+           size(HEIGHT, EQUAL, 25) | center | color(Color::Green1) |
+           bgcolor(Color::Grey3);
+  });
+
+  component |= CatchEvent([&](Event event) {
+    if (event == Event::Character('q')) {
+      screen.Exit();
+      return true;
+    }
+
+    return false;
+  });
+
+  return component;
 }

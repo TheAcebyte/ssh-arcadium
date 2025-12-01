@@ -2,6 +2,7 @@
 
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/screen_interactive.hpp"
+#include "shared/block-canvas/block-canvas.hpp"
 #include <string>
 
 using namespace ftxui;
@@ -22,8 +23,9 @@ private:
 
   void setTab(Tab tab);
   void generateUsername();
-  Component getPrompt();
-  Component getMenu();
+  BlockCanvas getSnake();
+  Component createPrompt();
+  Component createMenu();
 
 public:
   Launcher();

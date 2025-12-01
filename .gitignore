@@ -1,6 +1,6 @@
+.cache/
 vcpkg_installed/
 build/
 bin/
 compile_commands.json
 .env
-.cache

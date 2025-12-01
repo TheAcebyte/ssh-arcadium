@@ -35,6 +35,8 @@ dirs:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/launcher
+	mkdir -p $(BUILD_DIR)/shared
+	mkdir -p $(BUILD_DIR)/shared/block-canvas
 	mkdir -p $(BUILD_DIR)/shared/text-cycler
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
