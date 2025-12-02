@@ -1,7 +1,16 @@
 {
   "name": "ssh-arcadium",
   "dependencies": [
+    "boost-asio",
+    "boost-assert",
+    "boost-fusion",
+    "boost-numeric-conversion",
+    "boost-optional",
+    "boost-predef",
+    "boost-preprocessor",
+    "boost-utility",
+    "boost-variant",
     "ftxui",
-    "boost-asio"
+    "msgpack"
   ]
 }

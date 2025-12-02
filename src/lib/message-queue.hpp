@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mutex>
-#include <optional>
 #include <queue>
+#include <stdexcept>
 
 template <typename Message> class MessageQueue {
 private:
@@ -10,17 +10,15 @@ private:
   std::mutex mutex;
 
 public:
-  MessageQueue();
-
   void push(Message message) {
     std::lock_guard lock(mutex);
     queue.push(std::move(message));
   }
 
-  std::optional<Message> pop() {
+  Message pop() {
     std::lock_guard lock(mutex);
     if (queue.empty()) {
-      return std::nullopt;
+      throw std::runtime_error("Cannot pop from empty MessageQueue");
     }
 
     Message message = std::move(queue.front());
@@ -28,7 +26,7 @@ public:
     return message;
   }
 
-  bool empty() const {
+  bool empty() {
     std::lock_guard lock(mutex);
     return queue.empty();
   }

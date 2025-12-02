@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ftxui/dom/node.hpp"
-#include "shared/block-canvas/block-canvas.hpp"
-#include "shared/text-cycler/text-cycler.hpp"
+#include "lib/block-canvas/block-canvas.hpp"
+#include "lib/text-cycler/text-cycler.hpp"
 
 using namespace ftxui;
 

@@ -1,7 +1,7 @@
 #include "launcher-ui.hpp"
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/dom/node.hpp"
-#include "shared/text-cycler/text-cycler.hpp"
+#include "lib/text-cycler/text-cycler.hpp"
 #include <memory>
 
 LauncherUI::LauncherUI() { drawSnake(); }

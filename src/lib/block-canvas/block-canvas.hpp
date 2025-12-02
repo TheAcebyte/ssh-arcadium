@@ -2,7 +2,7 @@
 
 #include "ftxui/dom/canvas.hpp"
 #include "ftxui/screen/color.hpp"
-#include "shared/types.hpp"
+#include "lib/types.hpp"
 
 using namespace ftxui;
 

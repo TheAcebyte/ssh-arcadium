@@ -10,19 +10,15 @@ SRC_DIR = src
 BUILD_DIR = build
 BIN_DIR = bin
 
-SHARED_SRCS = $(wildcard $(SRC_DIR)/shared/*/*.cpp)
-SHARED_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SHARED_SRCS))
+LIB_SRCS = $(wildcard $(SRC_DIR)/lib/*/*.cpp)
+LIB_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(LIB_SRCS))
 
 LAUNCHER_SRCS = $(wildcard $(SRC_DIR)/launcher/*.cpp)
 LAUNCHER_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(LAUNCHER_SRCS))
 LAUNCHER_BIN = $(BIN_DIR)/launcher
 
-SNAKE_CLIENT_SRCS = $(wildcard $(SRC_DIR)/snake/client/*.cpp)
-SNAKE_CLIENT_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SNAKE_CLIENT_SRCS))
-SNAKE_CLIENT_BIN = $(BIN_DIR)/snake/client
-
 BINS = $(LAUNCHER_BIN)
-OBJS = $(SHARED_OBJS) $(LAUNCHER_OBJS)
+OBJS = $(LIB_OBJS) $(LAUNCHER_OBJS)
 
 .PHONY: all dirs vcpkg-install clean clean-all
 
@@ -37,22 +33,16 @@ vcpkg-install:
 
 dirs:
 	mkdir -p $(BUILD_DIR)
-	mkdir -p $(BUILD_DIR)/shared
-	mkdir -p $(BUILD_DIR)/shared/block-canvas
-	mkdir -p $(BUILD_DIR)/shared/text-cycler
+	mkdir -p $(BUILD_DIR)/lib
+	mkdir -p $(BUILD_DIR)/lib/block-canvas
+	mkdir -p $(BUILD_DIR)/lib/text-cycler
 	mkdir -p $(BUILD_DIR)/launcher
-	mkdir -p $(BUILD_DIR)/snake
-	mkdir -p $(BUILD_DIR)/snake/client
 	mkdir -p $(BIN_DIR)
-	mkdir -p $(BIN_DIR)/snake
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(LAUNCHER_BIN): $(LAUNCHER_OBJS) $(SHARED_OBJS)
-	$(CXX) $^ $(LDFLAGS) -o $@
-
-$(SNAKE_CLIENT_BIN): $(SNAKE_CLIENT_OBJS) $(SHARED_OBJS)
+$(LAUNCHER_BIN): $(LAUNCHER_OBJS) $(LIB_OBJS)
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 clean:
