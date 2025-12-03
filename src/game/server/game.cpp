@@ -10,13 +10,13 @@ void Game::run() {
   server.start();
   while (true) {
     auto startTime = std::chrono::steady_clock::now();
-    auto elapsedTime = std::chrono::steady_clock::now() - startTime;
 
     while (!server.empty()) {
       auto message = server.pop();
       processMessage(message);
     }
 
+    auto elapsedTime = std::chrono::steady_clock::now() - startTime;
     if (elapsedTime < tickRate) {
       std::this_thread::sleep_for(tickRate - elapsedTime);
     }
