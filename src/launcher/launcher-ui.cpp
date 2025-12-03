@@ -3,8 +3,22 @@
 #include "ftxui/dom/node.hpp"
 #include "lib/text-cycler/text-cycler.hpp"
 #include <memory>
+#include <stdexcept>
 
 LauncherUI::LauncherUI() { drawSnake(); }
+
+Element LauncherUI::render(LauncherUIContext context) {
+  switch (context.tab) {
+  case LauncherTab::PROMPT:
+    return renderPrompt(context.input, context.ellipsis);
+
+  case LauncherTab::MENU:
+    return renderMenu();
+
+  default:
+    throw std::runtime_error("Invalid launcher tab");
+  }
+}
 
 void LauncherUI::drawSnake() {
   snake.fill(0, 2, Color::DarkOliveGreen3);
@@ -55,14 +69,4 @@ Element LauncherUI::renderMenu() {
                   size(WIDTH, EQUAL, 50) | hcenter) |
          size(HEIGHT, EQUAL, 25) | center | color(Color::Green1) |
          bgcolor(Color::Grey3);
-}
-
-Element LauncherUI::render(LauncherUIContext context) {
-  switch (context.tab) {
-  case LauncherTab::PROMPT:
-    return renderPrompt(context.input, context.ellipsis);
-
-  case LauncherTab::MENU:
-    return renderMenu();
-  }
 }

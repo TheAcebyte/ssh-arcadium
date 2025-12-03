@@ -6,11 +6,18 @@
 #include "lib/random.hpp"
 #include "lib/text-cycler/text-cycler.hpp"
 #include "lib/types.hpp"
+#include <stdexcept>
 #include <string>
 
 using namespace ftxui;
 
 Launcher::Launcher() { generateUsername(); }
+
+void Launcher::run() {
+  auto component = createComponent();
+  addEventHandlers(component);
+  screen.Loop(component);
+}
 
 void Launcher::generateUsername() {
   u16 tag = Random::get<u16>();
@@ -65,12 +72,9 @@ void Launcher::addEventHandlers(Component &component) {
       }
 
       return false;
+
+    default:
+      throw std::runtime_error("Invalid launcher tab");
     }
   });
-}
-
-void Launcher::run() {
-  auto component = createComponent();
-  addEventHandlers(component);
-  screen.Loop(component);
 }

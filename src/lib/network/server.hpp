@@ -13,13 +13,15 @@
 
 namespace asio = boost::asio;
 
-template <typename Connection, typename Message> class Server {
+template <typename Connection, typename InMessage, typename OutMessage>
+class Server {
 private:
   asio::io_context io;
   asio::ip::tcp::acceptor acceptor;
-  MessageQueue<Message> incoming;
+  MessageQueue<InMessage> incoming;
 
-  std::map<u64, std::shared_ptr<Session<Connection, Message>>> sessions;
+  std::map<u64, std::shared_ptr<Session<Connection, InMessage, OutMessage>>>
+      sessions;
   std::mutex mutex;
   u64 nextId = 0;
 
@@ -32,29 +34,31 @@ private:
   EventHandlerMap handlers;
 
   void accept() {
-    acceptor.async_accept([this](boost::system::error_code error,
-                                 asio::ip::tcp::socket socket) {
-      if (!error && running) {
-        u64 id = nextId++;
-        auto session = std::make_shared<Session<Connection, Message>>(
-            SessionContext<Message>({.id = id,
-                                     .io = io,
-                                     .socket = std::move(socket),
-                                     .incoming = incoming}));
-        {
-          std::lock_guard lock(mutex);
-          sessions[id] = session;
-        }
+    acceptor.async_accept(
+        [this](boost::system::error_code error, asio::ip::tcp::socket socket) {
+          if (!error && running) {
+            u64 id = nextId++;
+            auto session =
+                std::make_shared<Session<Connection, InMessage, OutMessage>>(
+                    SessionContext<InMessage>({.id = id,
+                                               .io = io,
+                                               .socket = std::move(socket),
+                                               .incoming = incoming}));
+            {
+              std::lock_guard lock(mutex);
+              sessions[id] = session;
+            }
 
-        session->start();
-        session->addEventHandler(Event::DISCONNECT,
-                                 [this, id] { fire(Event::DISCONNECT, id); });
-        session->addEventHandler(Event::MESSAGE,
-                                 [this, id] { fire(Event::MESSAGE, id); });
-        fire(Event::CONNECT, id);
-        accept();
-      }
-    });
+            session->start();
+            session->addEventHandler(Event::DISCONNECT, [this, id] {
+              disconnect(id), fire(Event::DISCONNECT, id);
+            });
+            session->addEventHandler(Event::MESSAGE,
+                                     [this, id] { fire(Event::MESSAGE, id); });
+            fire(Event::CONNECT, id);
+            accept();
+          }
+        });
   }
 
   void disconnect(u64 id) {
@@ -112,7 +116,7 @@ public:
     }
   }
 
-  void send(u64 id, Message message) {
+  void send(u64 id, OutMessage message) {
     std::lock_guard lock(mutex);
     if (!sessions.count(id)) {
       auto error = std::format("Could not find session with ID: {}", id);
@@ -123,14 +127,14 @@ public:
     session->send(message);
   }
 
-  void broadcast(Message message) {
+  void broadcast(OutMessage message) {
     std::lock_guard lock(mutex);
     for (auto &[id, session] : sessions) {
       session->send(message);
     }
   }
 
-  void broadcastExcept(Message message, u64 excludedId) {
+  void broadcastExcept(OutMessage message, u64 excludedId) {
     std::lock_guard lock(mutex);
     for (auto &[id, session] : sessions) {
       if (id == excludedId) {
@@ -142,7 +146,7 @@ public:
   }
 
   bool empty() { return incoming.empty(); }
-  Message process() { return incoming.pop(); }
+  InMessage pop() { return incoming.pop(); }
 
   void addEventHandler(Event event, EventHandler handler) {
     handlers[event].push_back(handler);

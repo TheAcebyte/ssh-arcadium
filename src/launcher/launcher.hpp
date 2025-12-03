@@ -4,6 +4,7 @@
 #include "ftxui/component/screen_interactive.hpp"
 #include "launcher-ui.hpp"
 
+// TODO: Run games with execvp() through some static method
 class Launcher {
 private:
   ScreenInteractive screen = ScreenInteractive::Fullscreen();

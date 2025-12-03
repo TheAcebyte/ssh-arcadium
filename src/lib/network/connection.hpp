@@ -13,22 +13,22 @@
 
 namespace asio = boost::asio;
 
-template <typename Message> struct ConnectionContext {
+template <typename InMessage, typename OutMessage> struct ConnectionContext {
   asio::io_context &io;
   asio::ip::tcp::socket socket;
-  MessageQueue<Message> &incoming;
-  MessageQueue<Message> &outgoing;
+  MessageQueue<InMessage> &incoming;
+  MessageQueue<OutMessage> &outgoing;
 };
 
-template <typename Message> class Connection {
+template <typename InMessage, typename OutMessage> class Connection {
 protected:
   static constexpr st size = 4096;
   static constexpr std::chrono::duration delay = std::chrono::milliseconds(10);
 
   asio::io_context &io;
   asio::ip::tcp::socket socket;
-  MessageQueue<Message> &incoming;
-  MessageQueue<Message> &outgoing;
+  MessageQueue<InMessage> &incoming;
+  MessageQueue<OutMessage> &outgoing;
   std::vector<u8> buffer;
 
   using Event = NetworkEvent;
@@ -75,8 +75,8 @@ protected:
     }
   }
 
-  virtual std::vector<u8> serialize(const Message &message) = 0;
-  virtual Message deserialize(const char *data, st length) = 0;
+  virtual std::vector<u8> serialize(const OutMessage &message) = 0;
+  virtual InMessage deserialize(const char *data, st length) = 0;
 
   void fire(Event event) {
     for (auto handler : handlers[event]) {
@@ -85,7 +85,7 @@ protected:
   }
 
 public:
-  Connection(ConnectionContext<Message> context)
+  Connection(ConnectionContext<InMessage, OutMessage> context)
       : io(context.io), socket(std::move(context.socket)),
         incoming(context.incoming), outgoing(context.outgoing) {
     buffer.resize(size);
@@ -104,9 +104,9 @@ public:
     }
   }
 
-  void connect(std::string_view host, std::string_view port) {
+  void connect(std::string_view host, st port) {
     asio::ip::tcp::resolver resolver(io);
-    auto endpoint = resolver.resolve(host, port);
+    auto endpoint = resolver.resolve(host, std::to_string(port));
     asio::connect(socket, endpoint);
   }
 

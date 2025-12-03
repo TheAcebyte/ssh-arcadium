@@ -3,6 +3,12 @@
 #include "game-state.hpp"
 #include "game/shared/config.hpp"
 #include "lib/block-canvas/block-canvas.hpp"
+#include "lib/text-cycler/text-cycler.hpp"
+#include <memory>
+
+struct GameUIContext {
+  std::shared_ptr<TextCycler> ellipsis;
+};
 
 class GameUI {
 private:
@@ -18,5 +24,5 @@ private:
 
 public:
   GameUI(const GameState &);
-  Element render();
+  Element render(GameUIContext context);
 };

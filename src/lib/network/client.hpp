@@ -2,6 +2,7 @@
 
 #include "event.hpp"
 #include "lib/message-queue.hpp"
+#include "lib/types.hpp"
 #include <atomic>
 #include <boost/asio.hpp>
 #include <functional>
@@ -9,11 +10,12 @@
 
 namespace asio = boost::asio;
 
-template <typename Connection, typename Message> class Client {
+template <typename Connection, typename InMessage, typename OutMessage>
+class Client {
 private:
   asio::io_context io;
-  MessageQueue<Message> incoming;
-  MessageQueue<Message> outgoing;
+  MessageQueue<InMessage> incoming;
+  MessageQueue<OutMessage> outgoing;
   Connection connection;
 
   std::thread thread;
@@ -31,7 +33,7 @@ public:
 
   ~Client() { stop(); }
 
-  void connect(std::string_view host, std::string_view port) {
+  void connect(std::string_view host, st port) {
     if (running) {
       return;
     }
@@ -56,9 +58,9 @@ public:
     }
   }
 
-  void send(Message message) { outgoing.push(message); }
+  void send(OutMessage message) { outgoing.push(message); }
   bool empty() { return incoming.empty(); }
-  Message process() { return incoming.pop(); }
+  InMessage pop() { return incoming.pop(); }
 
   void addEventHandler(Event event, EventHandler handler) {
     connection.addEventHandler(event, handler);

@@ -1,9 +1,26 @@
 #include "game-ui.hpp"
 #include "ftxui/dom/elements.hpp"
+#include "game/client/game-state.hpp"
 #include "game/shared/config.hpp"
 #include "lib/types.hpp"
 
 GameUI::GameUI(const GameState &state) : state(state) {}
+
+Element GameUI::render(GameUIContext context) {
+  if (state.getConnectionStatus() == ConnectionStatus::CONNECTING) {
+    return hbox(text("Connecting to server"),
+                text(context.ellipsis->getValue())) |
+           center | color(Color::Green1) | bgcolor(Color::Grey3);
+  }
+
+  return hbox(vbox(renderLeaderboard() | flex, renderEvents() | flex) |
+                  size(WIDTH, EQUAL, Config::gridSize),
+              separatorEmpty(), separatorEmpty(), renderGrid(),
+              separatorEmpty(), separatorEmpty(),
+              vbox(renderInfo() | flex, renderControls()) |
+                  size(WIDTH, EQUAL, Config::gridSize)) |
+         center | color(Color::Green1) | bgcolor(Color::Grey3);
+}
 
 Element GameUI::renderGrid() {
   st heightError = 2;
@@ -37,13 +54,3 @@ Element GameUI::renderControls() {
            separatorEmpty()),
       LIGHT);
 };
-
-Element GameUI::render() {
-  return hbox(vbox(renderLeaderboard() | flex, renderEvents() | flex) |
-                  size(WIDTH, EQUAL, Config::gridSize),
-              separatorEmpty(), separatorEmpty(), renderGrid(),
-              separatorEmpty(), separatorEmpty(),
-              vbox(renderInfo() | flex, renderControls()) |
-                  size(WIDTH, EQUAL, Config::gridSize)) |
-         center | color(Color::Green1) | bgcolor(Color::Grey3);
-}

@@ -8,24 +8,25 @@
 
 namespace asio = boost::asio;
 
-template <typename Message> struct SessionContext {
+template <typename InMessage> struct SessionContext {
   u64 id;
   asio::io_context &io;
   asio::ip::tcp::socket socket;
-  MessageQueue<Message> &incoming;
+  MessageQueue<InMessage> &incoming;
 };
 
-template <typename Connection, typename Message> class Session {
+template <typename Connection, typename InMessage, typename OutMessage>
+class Session {
 private:
   u64 id;
-  MessageQueue<Message> outgoing;
+  MessageQueue<OutMessage> outgoing;
   Connection connection;
 
   using Event = NetworkEvent;
   using EventHandler = std::function<void()>;
 
 public:
-  Session(SessionContext<Message> context)
+  Session(SessionContext<InMessage> context)
       : id(context.id), connection({.io = context.io,
                                     .socket = std::move(context.socket),
                                     .incoming = context.incoming,
@@ -37,7 +38,7 @@ public:
   void stop() { connection.stop(); }
 
   u64 getId() const { return id; }
-  void send(Message message) { outgoing.push(message); }
+  void send(OutMessage message) { outgoing.push(message); }
 
   void addEventHandler(Event event, EventHandler handler) {
     connection.addEventHandler(event, handler);

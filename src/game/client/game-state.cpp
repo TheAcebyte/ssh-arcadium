@@ -3,6 +3,14 @@
 #include <string>
 #include <string_view>
 
+void GameState::setConnected() {
+  connectionStatus = ConnectionStatus::CONNECTED;
+};
+
+ConnectionStatus GameState::getConnectionStatus() const {
+  return connectionStatus;
+};
+
 u64 GameState::getId() const { return id; }
 void GameState::setId(u64 id) { this->id = id; }
 
