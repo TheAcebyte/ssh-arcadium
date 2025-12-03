@@ -17,8 +17,19 @@ LAUNCHER_SRCS = $(wildcard $(SRC_DIR)/launcher/*.cpp)
 LAUNCHER_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(LAUNCHER_SRCS))
 LAUNCHER_BIN = $(BIN_DIR)/launcher
 
-BINS = $(LAUNCHER_BIN)
-OBJS = $(LIB_OBJS) $(LAUNCHER_OBJS)
+GAME_SHARED_SRCS = $(wildcard $(SRC_DIR)/game/shared/*.cpp)
+GAME_SHARED_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(GAME_SHARED_SRCS))
+
+GAME_CLIENT_SRCS = $(wildcard $(SRC_DIR)/game/client/*.cpp)
+GAME_CLIENT_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(GAME_CLIENT_SRCS))
+GAME_CLIENT_BIN = $(BIN_DIR)/game/client
+
+GAME_SERVER_SRCS = $(wildcard $(SRC_DIR)/game/server/*.cpp)
+GAME_SERVER_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(GAME_SERVER_SRCS))
+GAME_SERVER_BIN = $(BIN_DIR)/game/server
+
+BINS = $(LAUNCHER_BIN) $(GAME_CLIENT_BIN) $(GAME_SERVER_BIN)
+OBJS = $(LIB_OBJS) $(LAUNCHER_OBJS) $(GAME_SHARED_OBJS) $(GAME_CLIENT_OBJS) $(GAME_SERVER_OBJS)
 
 .PHONY: all dirs vcpkg-install clean clean-all
 
@@ -37,12 +48,22 @@ dirs:
 	mkdir -p $(BUILD_DIR)/lib/block-canvas
 	mkdir -p $(BUILD_DIR)/lib/text-cycler
 	mkdir -p $(BUILD_DIR)/launcher
+	mkdir -p $(BUILD_DIR)/game/shared
+	mkdir -p $(BUILD_DIR)/game/client
+	mkdir -p $(BUILD_DIR)/game/server
 	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/game
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(LAUNCHER_BIN): $(LAUNCHER_OBJS) $(LIB_OBJS)
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+$(GAME_CLIENT_BIN): $(GAME_CLIENT_OBJS) $(GAME_SHARED_OBJS) $(LIB_OBJS)
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+$(GAME_SERVER_BIN): $(GAME_SERVER_OBJS) $(GAME_SHARED_OBJS) $(LIB_OBJS)
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 clean:

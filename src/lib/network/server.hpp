@@ -26,6 +26,7 @@ private:
   std::thread thread;
   std::atomic<bool> running = false;
 
+  using Event = NetworkEvent;
   using EventHandler = std::function<void(u64)>;
   using EventHandlerMap = std::map<Event, std::vector<EventHandler>>;
   EventHandlerMap handlers;
@@ -125,6 +126,17 @@ public:
   void broadcast(Message message) {
     std::lock_guard lock(mutex);
     for (auto &[id, session] : sessions) {
+      session->send(message);
+    }
+  }
+
+  void broadcastExcept(Message message, u64 excludedId) {
+    std::lock_guard lock(mutex);
+    for (auto &[id, session] : sessions) {
+      if (id == excludedId) {
+        continue;
+      }
+
       session->send(message);
     }
   }

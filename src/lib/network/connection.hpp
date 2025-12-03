@@ -31,6 +31,7 @@ protected:
   MessageQueue<Message> &outgoing;
   std::vector<u8> buffer;
 
+  using Event = NetworkEvent;
   using EventHandler = std::function<void()>;
   using EventHandlerMap = std::map<Event, std::vector<EventHandler>>;
   EventHandlerMap handlers;

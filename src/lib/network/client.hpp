@@ -19,6 +19,7 @@ private:
   std::thread thread;
   std::atomic<bool> running = false;
 
+  using Event = NetworkEvent;
   using EventHandler = std::function<void()>;
 
 public:

@@ -1,6 +1,6 @@
 #pragma once
 
-enum class Event {
+enum class NetworkEvent {
   CONNECT,
   DISCONNECT,
   MESSAGE,

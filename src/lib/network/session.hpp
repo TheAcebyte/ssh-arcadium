@@ -21,6 +21,7 @@ private:
   MessageQueue<Message> outgoing;
   Connection connection;
 
+  using Event = NetworkEvent;
   using EventHandler = std::function<void()>;
 
 public:
