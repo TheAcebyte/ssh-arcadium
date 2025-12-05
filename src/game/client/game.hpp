@@ -5,7 +5,7 @@
 #include "game-client.hpp"
 #include "game-state.hpp"
 #include "game-ui.hpp"
-#include "game/shared/server.hpp"
+#include "game/shared/server-message.hpp"
 #include <string_view>
 
 class Game {
@@ -17,10 +17,10 @@ private:
 
   void addNetworkEventHandlers();
   Component createComponent();
-  void processMessage(const ServerMessage &message);
+  void addInputEventHandlers(Component &component);
+  void processMessage(ServerMessage message);
 
 public:
   Game(std::string_view username);
   void run();
 };
-

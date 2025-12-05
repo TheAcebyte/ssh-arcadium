@@ -21,15 +21,17 @@ template <typename InMessage, typename OutMessage> struct ConnectionContext {
 };
 
 template <typename InMessage, typename OutMessage> class Connection {
-protected:
-  static constexpr st size = 4096;
+private:
+  static constexpr u8 headerSize = 4;
   static constexpr std::chrono::duration delay = std::chrono::milliseconds(10);
 
   asio::io_context &io;
   asio::ip::tcp::socket socket;
   MessageQueue<InMessage> &incoming;
   MessageQueue<OutMessage> &outgoing;
-  std::vector<u8> buffer;
+
+  u32 length = 0;
+  std::vector<u8> payload;
 
   using Event = NetworkEvent;
   using EventHandler = std::function<void()>;
@@ -37,19 +39,30 @@ protected:
   EventHandlerMap handlers;
 
   void read() {
-    socket.async_read_some(asio::buffer(buffer),
-                           [this](boost::system::error_code error, st length) {
-                             if (!error) {
-                               auto data = reinterpret_cast<const char *>(
-                                   buffer.data());
-                               auto message = deserialize(data, length);
-                               incoming.push(message);
-                               fire(Event::MESSAGE);
-                               read();
-                             } else {
+    asio::async_read(socket, asio::buffer(&length, headerSize),
+                     [this](boost::system::error_code error, st) {
+                       if (error) {
+                         fire(Event::DISCONNECT);
+                         return;
+                       }
+
+                       payload.resize(length);
+                       asio::async_read(
+                           socket, asio::buffer(payload),
+                           [this](boost::system::error_code error, st) {
+                             if (error) {
                                fire(Event::DISCONNECT);
+                               return;
                              }
+
+                             auto data =
+                                 reinterpret_cast<const char *>(payload.data());
+                             auto message = deserialize(data, length);
+                             incoming.push(message);
+                             fire(Event::MESSAGE);
+                             read();
                            });
+                     });
   }
 
   void write() {
@@ -61,22 +74,26 @@ protected:
           write();
         }
       });
-    } else {
-      auto message = outgoing.pop();
-      auto data = std::make_shared<std::vector<u8>>(serialize(message));
-      asio::async_write(socket, asio::buffer(*data),
-                        [this, data](boost::system::error_code error, st) {
-                          if (!error) {
-                            write();
-                          } else {
-                            fire(Event::DISCONNECT);
-                          }
-                        });
+      return;
     }
-  }
+    auto message = outgoing.pop();
+    auto payload = serialize(message);
 
-  virtual std::vector<u8> serialize(const OutMessage &message) = 0;
-  virtual InMessage deserialize(const char *data, st length) = 0;
+    u32 length = payload.size();
+    auto data = std::make_shared<std::vector<u8>>(headerSize + length);
+    std::memcpy(data->data(), &length, headerSize);
+    std::copy(payload.begin(), payload.end(), data->begin() + headerSize);
+
+    asio::async_write(socket, asio::buffer(*data),
+                      [this, data](boost::system::error_code error, st) {
+                        if (error) {
+                          fire(Event::DISCONNECT);
+                          return;
+                        }
+
+                        write();
+                      });
+  }
 
   void fire(Event event) {
     for (auto handler : handlers[event]) {
@@ -84,12 +101,14 @@ protected:
     }
   }
 
+protected:
+  virtual std::vector<u8> serialize(OutMessage message) = 0;
+  virtual InMessage deserialize(const char *data, st length) = 0;
+
 public:
   Connection(ConnectionContext<InMessage, OutMessage> context)
       : io(context.io), socket(std::move(context.socket)),
-        incoming(context.incoming), outgoing(context.outgoing) {
-    buffer.resize(size);
-  }
+        incoming(context.incoming), outgoing(context.outgoing) {}
 
   virtual ~Connection() { stop(); }
 

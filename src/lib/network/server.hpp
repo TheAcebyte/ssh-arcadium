@@ -64,7 +64,7 @@ private:
   void disconnect(u64 id) {
     std::lock_guard lock(mutex);
     if (!sessions.count(id)) {
-      auto error = std::format("Could not find session with ID: {}", id);
+      auto error = std::format("Could not find session with ID {}.", id);
       throw std::runtime_error(error);
     }
 
@@ -119,7 +119,7 @@ public:
   void send(u64 id, OutMessage message) {
     std::lock_guard lock(mutex);
     if (!sessions.count(id)) {
-      auto error = std::format("Could not find session with ID: {}", id);
+      auto error = std::format("Could not find session with ID {}.", id);
       throw std::runtime_error(error);
     }
 

@@ -47,6 +47,7 @@ dirs:
 	mkdir -p $(BUILD_DIR)/lib
 	mkdir -p $(BUILD_DIR)/lib/block-canvas
 	mkdir -p $(BUILD_DIR)/lib/text-cycler
+	mkdir -p $(BUILD_DIR)/lib/point
 	mkdir -p $(BUILD_DIR)/launcher
 	mkdir -p $(BUILD_DIR)/game/shared
 	mkdir -p $(BUILD_DIR)/game/client

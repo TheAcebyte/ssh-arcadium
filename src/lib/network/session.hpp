@@ -38,7 +38,7 @@ public:
   void stop() { connection.stop(); }
 
   u64 getId() const { return id; }
-  void send(OutMessage message) { outgoing.push(message); }
+  void send(OutMessage message) { outgoing.push(std::move(message)); }
 
   void addEventHandler(Event event, EventHandler handler) {
     connection.addEventHandler(event, handler);

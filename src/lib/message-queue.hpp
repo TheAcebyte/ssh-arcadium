@@ -18,7 +18,7 @@ public:
   Message pop() {
     std::lock_guard lock(mutex);
     if (queue.empty()) {
-      throw std::runtime_error("Cannot pop from empty MessageQueue");
+      throw std::runtime_error("Cannot pop from empty MessageQueue.");
     }
 
     Message message = std::move(queue.front());

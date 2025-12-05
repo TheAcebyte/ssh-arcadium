@@ -16,22 +16,22 @@ Element LauncherUI::render(LauncherUIContext context) {
     return renderMenu();
 
   default:
-    throw std::runtime_error("Invalid launcher tab");
+    throw std::runtime_error("Invalid launcher tab.");
   }
 }
 
 void LauncherUI::drawSnake() {
-  snake.fill(0, 2, Color::DarkOliveGreen3);
-  snake.fill(1, 2, Color::DarkGreen);
-  snake.fill(2, 2, Color::DarkGreen);
-  snake.fill(2, 1, Color::DarkGreen);
-  snake.fill(2, 0, Color::DarkGreen);
-  snake.fill(3, 0, Color::DarkGreen);
-  snake.fill(4, 0, Color::DarkGreen);
-  snake.fill(4, 1, Color::DarkGreen);
-  snake.fill(4, 2, Color::DarkGreen);
-  snake.fill(4, 3, Color::DarkGreen);
-  snake.fill(4, 4, Color::DarkGreen);
+  snake.fill(0, 2, Color::GreenYellow);
+  snake.fill(1, 2, Color::Chartreuse3);
+  snake.fill(2, 2, Color::Chartreuse3);
+  snake.fill(2, 1, Color::Chartreuse3);
+  snake.fill(2, 0, Color::Chartreuse3);
+  snake.fill(3, 0, Color::Chartreuse3);
+  snake.fill(4, 0, Color::Chartreuse3);
+  snake.fill(4, 1, Color::Chartreuse3);
+  snake.fill(4, 2, Color::Chartreuse3);
+  snake.fill(4, 3, Color::Chartreuse3);
+  snake.fill(4, 4, Color::Chartreuse3);
 }
 
 Element LauncherUI::renderPrompt(Element input,

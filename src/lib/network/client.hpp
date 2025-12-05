@@ -58,7 +58,7 @@ public:
     }
   }
 
-  void send(OutMessage message) { outgoing.push(message); }
+  void send(OutMessage message) { outgoing.push(std::move(message)); }
   bool empty() { return incoming.empty(); }
   InMessage pop() { return incoming.pop(); }
 

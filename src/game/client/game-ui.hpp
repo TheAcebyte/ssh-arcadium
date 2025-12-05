@@ -13,8 +13,9 @@ struct GameUIContext {
 class GameUI {
 private:
   const GameState &state;
-  BlockCanvas grid =
+  BlockCanvas gridCanvas =
       BlockCanvas(Config::gridSize, Config::gridSize, Color::Grey3);
+  BlockCanvas snakeCanvas = BlockCanvas(1, 5, Color::Grey3);
 
   Element renderGrid();
   Element renderLeaderboard();

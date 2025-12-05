@@ -1,10 +1,12 @@
 #include "game.hpp"
+#include "game/shared/server-message.hpp"
+#include "lib/network/event.hpp"
 #include "lib/overload.hpp"
 #include <chrono>
 #include <iostream>
 #include <thread>
 
-Game::Game() : server(4000) { addNetworkEventHandlers(); }
+Game::Game() : server(4000) { addEventHandlers(); }
 
 void Game::run() {
   server.start();
@@ -16,6 +18,9 @@ void Game::run() {
       processMessage(message);
     }
 
+    state.tick();
+    broadcastState();
+
     auto elapsedTime = std::chrono::steady_clock::now() - startTime;
     if (elapsedTime < tickRate) {
       std::this_thread::sleep_for(tickRate - elapsedTime);
@@ -23,20 +28,40 @@ void Game::run() {
   }
 }
 
-void Game::addNetworkEventHandlers() {
+void Game::addEventHandlers() {
   server.addEventHandler(NetworkEvent::CONNECT, [this](u64 id) {
     auto message = IdMessage(id);
     server.send(id, message);
-    std::cout << "Received new connection with ID: " << id << std::endl;
   });
+
+  server.addEventHandler(NetworkEvent::DISCONNECT,
+                         [this](u64 id) { state.removePlayer(id); });
 }
 
-void Game::processMessage(const ClientMessage &message) {
+void Game::processMessage(ClientMessage message) {
   std::visit(Overload(
-                 [this](const PlayMessage &in) {
-                   AckMessage out(AckType::ACK_PLAY);
-                   server.send(in.id, out);
+                 [this](PlayMessage message) {
+                   state.addPlayer(message.id, message.username);
+
+                   GridMessage grid(state.getGrid());
+                   server.send(message.id, std::move(grid));
+
+                   PlayersMessage players(state.getPlayers());
+                   server.send(message.id, std::move(players));
+
+                   AckMessage ack(AckType::PLAY);
+                   server.send(message.id, ack);
                  },
-                 [](const MoveMessage &in) {}),
+                 [this](MoveMessage message) {
+                   state.setPlayerInput(message.id, message.direction);
+                 }),
              message);
+}
+
+void Game::broadcastState() {
+  GridMessage grid(state.getGrid());
+  server.broadcast(std::move(grid));
+
+  PlayersMessage players(state.getPlayers());
+  server.broadcast(std::move(players));
 }

@@ -74,7 +74,7 @@ void Launcher::addEventHandlers(Component &component) {
       return false;
 
     default:
-      throw std::runtime_error("Invalid launcher tab");
+      throw std::runtime_error("Invalid launcher tab.");
     }
   });
 }
