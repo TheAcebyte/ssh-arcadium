@@ -21,6 +21,9 @@ private:
   std::set<Point> fruits;
   st fruitTimer = Config::fruitSpawnRate;
 
+  std::vector<std::string> events;
+  st lastEventIndex = 0;
+
   // TODO: Handle case when no spawnpoint is available
   Point getRandomSnakeSpawn();
   Point getRandomFruitSpawn();
@@ -47,4 +50,8 @@ public:
   void setPlayerInput(u64 id, Direction direction);
   void respawnPlayer(u64 id);
   // bool consumePlayersUpdate();
+
+  void addEvent(std::string event);
+  bool hasUnreadEvents() const;
+  std::vector<std::string> readEvents();
 };

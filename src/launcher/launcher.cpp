@@ -8,8 +8,6 @@
 #include "lib/types.hpp"
 #include <stdexcept>
 #include <string>
-#include <thread>
-#include <unistd.h>
 
 using namespace ftxui;
 

@@ -1,5 +1,6 @@
 #include "game-state.hpp"
 #include "lib/types.hpp"
+#include <iterator>
 #include <string>
 #include <string_view>
 
@@ -55,4 +56,12 @@ void GameState::calculateLeaderboard() {
                     [](auto a, auto b) { return a.score > b.score; });
 
   leaderboard = std::move(newLeaderboard);
+}
+
+const std::vector<std::string> &GameState::getEvents() const { return events; }
+
+void GameState::addEvents(std::vector<std::string> newEvents) {
+  auto begin = std::make_move_iterator(newEvents.begin());
+  auto end = std::make_move_iterator(newEvents.end());
+  events.insert(events.end(), begin, end);
 }

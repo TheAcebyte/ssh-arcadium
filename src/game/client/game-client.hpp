@@ -60,6 +60,9 @@ private:
     case ServerMessageType::PLAYERS:
       return payload.as<PlayersMessage>();
 
+    case ServerMessageType::EVENT:
+      return payload.as<EventsMessage>();
+
     default:
       throw std::runtime_error("Invalid message type.");
     }

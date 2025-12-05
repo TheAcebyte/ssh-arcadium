@@ -92,6 +92,9 @@ void Game::processMessage(ServerMessage message) {
                  },
                  [this](PlayersMessage message) {
                    state.setPlayers(std::move(message.players));
+                 },
+                 [this](EventsMessage message) {
+                   state.addEvents(std::move(message.events));
                  }),
              message);
 }

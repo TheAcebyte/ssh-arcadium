@@ -35,6 +35,10 @@ private:
                    [&](PlayersMessage message) {
                      packer.pack(ServerMessageType::PLAYERS);
                      packer.pack(std::move(message));
+                   },
+                   [&](EventsMessage message) {
+                     packer.pack(ServerMessageType::EVENT);
+                     packer.pack(std::move(message));
                    }),
                message);
 

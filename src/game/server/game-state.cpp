@@ -29,7 +29,7 @@ void GameState::addPlayer(u64 id, std::string username) {
 
   Player player = {
       .id = id,
-      .username = std::move(username),
+      .username = username,
       .status = Status::ALIVE,
       .score = 0,
       .color = Config::getRandomColor(),
@@ -39,6 +39,9 @@ void GameState::addPlayer(u64 id, std::string username) {
   players[id] = std::move(player);
   inputs[id] = Direction::UP;
   spawnPlayer(id);
+
+  std::string event = std::format("> {} joined", players[id].username);
+  addEvent(event);
 }
 
 void GameState::removePlayer(u64 id) {
@@ -47,9 +50,14 @@ void GameState::removePlayer(u64 id) {
     throw std::runtime_error(error);
   }
 
+  std::string username = players[id].username;
+
   killPlayer(id);
   inputs.erase(id);
   players.erase(id);
+
+  std::string event = std::format("< {} left", username);
+  addEvent(event);
 }
 
 void GameState::setPlayerInput(u64 id, Direction input) {
@@ -72,6 +80,21 @@ void GameState::respawnPlayer(u64 id) {
   }
 
   spawnPlayer(id);
+}
+
+void GameState::addEvent(std::string event) {
+  events.push_back(std::move(event));
+}
+
+bool GameState::hasUnreadEvents() const {
+  return lastEventIndex < events.size();
+}
+
+std::vector<std::string> GameState::readEvents() {
+  auto begin = events.begin() + lastEventIndex;
+  std::vector<std::string> unread(begin, events.end());
+  lastEventIndex = events.size();
+  return unread;
 }
 
 Point GameState::getRandomSnakeSpawn() {
@@ -148,6 +171,9 @@ void GameState::killPlayer(u64 id) {
   players[id].color = Config::getRandomColor();
   players[id].direction = Direction::UP;
   inputs[id] = Direction::UP;
+
+  std::string event = std::format("X {} died", players[id].username);
+  addEvent(event);
 }
 
 void GameState::applyInputs() {

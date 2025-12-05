@@ -14,7 +14,7 @@ Element GameUI::render(GameUIContext context) {
            center | color(Color::Green1) | bgcolor(Color::Grey3);
   }
 
-  return hbox(vbox(renderLeaderboard() | flex, renderEvents() | flex) |
+  return hbox(vbox(renderLeaderboard(), renderEvents() | flex) |
                   size(WIDTH, EQUAL, Config::gridSize),
               separatorEmpty(), separatorEmpty(), renderGrid(),
               separatorEmpty(), separatorEmpty(),
@@ -52,9 +52,11 @@ Element GameUI::renderGrid() {
 }
 
 Element GameUI::renderLeaderboard() {
-  Elements entries;
   auto leaderboard = state.getLeaderboard();
-  for (st i = 0; i < leaderboard.size(); ++i) {
+  Elements entries;
+  st maxEntries = 10;
+  st entriesCount = std::min(maxEntries, leaderboard.size());
+  for (st i = 0; i < entriesCount; ++i) {
     auto entry = leaderboard[i];
     auto rank = std::to_string(i + 1);
     auto score = std::to_string(entry.score);
@@ -62,15 +64,37 @@ Element GameUI::renderLeaderboard() {
                            filler(), text(score) | color(Color::GreenYellow)));
   }
 
+  st heightError = 1;
+  st height = Config::gridSize / 2 + heightError;
   return window(text(" Leaderboard "),
                 hbox(separatorEmpty(),
                      vbox(separatorEmpty(), entries, separatorEmpty()) | flex,
-                     separatorEmpty()) | flex,
-                LIGHT);
+                     separatorEmpty()) |
+                    flex,
+                LIGHT) |
+         size(HEIGHT, EQUAL, height);
 };
 
 Element GameUI::renderEvents() {
-  return window(text(" Events "), vbox(), LIGHT);
+  auto events = state.getEvents();
+  Elements entries;
+  st maxEntries = 5;
+  st entriesCount = std::min(maxEntries, events.size());
+  for (st i = 0; i < entriesCount; ++i) {
+    if (i > 0) {
+      entries.push_back(separatorEmpty());
+    }
+
+    st index = events.size() - i - 1;
+    entries.push_back(hbox(paragraph(events[index])));
+  }
+
+  return window(text(" Events "),
+                hbox(separatorEmpty(),
+                     vbox(separatorEmpty(), entries, separatorEmpty()) | flex,
+                     separatorEmpty()) |
+                    flex,
+                LIGHT);
 };
 
 Element GameUI::renderInfo() {

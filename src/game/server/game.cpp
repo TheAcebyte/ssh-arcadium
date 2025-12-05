@@ -67,4 +67,9 @@ void Game::broadcastState() {
 
   PlayersMessage players(state.getPlayers());
   server.broadcast(std::move(players));
+
+  if (state.hasUnreadEvents()) {
+    EventsMessage events(state.readEvents());
+    server.broadcast(std::move(events));
+  }
 }

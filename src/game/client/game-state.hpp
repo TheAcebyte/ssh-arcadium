@@ -24,8 +24,9 @@ private:
 
   Grid grid;
   std::map<u64, Player> players;
-
   std::vector<LeaderboardEntry> leaderboard;
+  std::vector<std::string> events;
+
   void calculateLeaderboard();
 
 public:
@@ -45,5 +46,8 @@ public:
   const std::map<u64, Player> &getPlayers() const;
   void setPlayers(std::map<u64, Player> players);
 
-  const std::vector<LeaderboardEntry>& getLeaderboard() const;
+  const std::vector<LeaderboardEntry> &getLeaderboard() const;
+
+  const std::vector<std::string>& getEvents() const;
+  void addEvents(std::vector<std::string> newEvents);
 };

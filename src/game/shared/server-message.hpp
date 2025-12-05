@@ -4,12 +4,14 @@
 #include "state.hpp"
 #include <map>
 #include <msgpack.hpp>
+#include <string>
 
 enum class ServerMessageType {
   ACK,
   ID,
   GRID,
   PLAYERS,
+  EVENT,
 };
 
 MSGPACK_ADD_ENUM(ServerMessageType);
@@ -45,5 +47,11 @@ struct PlayersMessage {
   MSGPACK_DEFINE(players);
 };
 
+struct EventsMessage {
+  std::vector<std::string> events;
+
+  MSGPACK_DEFINE(events);
+};
+
 using ServerMessage =
-    std::variant<AckMessage, IdMessage, GridMessage, PlayersMessage>;
+    std::variant<AckMessage, IdMessage, GridMessage, PlayersMessage, EventsMessage>;
