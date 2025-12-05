@@ -61,8 +61,8 @@ Element LauncherUI::renderMenu() {
               hbox(hbox(text("ENTER") | color(Color::GreenYellow),
                         text(" - Play")),
                    filler(),
-                   hbox(text("s") | color(Color::GreenYellow),
-                        text(" - Settings")),
+                   hbox(text("r") | color(Color::GreenYellow),
+                        text(" - Rename")),
                    filler(),
                    hbox(text("q") | color(Color::GreenYellow),
                         text(" - Quit"))) |

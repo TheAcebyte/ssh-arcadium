@@ -26,6 +26,10 @@ private:
                    [&](MoveMessage message) {
                      packer.pack(ClientMessageType::MOVE);
                      packer.pack(message);
+                   },
+                   [&](RespawnMessage message) {
+                     packer.pack(ClientMessageType::RESPAWN);
+                     packer.pack(message);
                    }),
                message);
 

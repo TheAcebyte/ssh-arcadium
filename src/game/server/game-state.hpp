@@ -24,10 +24,10 @@ private:
   // TODO: Handle case when no spawnpoint is available
   Point getRandomSnakeSpawn();
   Point getRandomFruitSpawn();
+  Point getNextSnakePosition(u64 id);
 
-  void spawnSnake(u64 id);
-  void killSnake(u64 id);
-  Point getNextSnakeHead(u64 id);
+  void spawnPlayer(u64 id);
+  void killPlayer(u64 id);
 
   void applyInputs();
   void spawnFruit();
@@ -45,5 +45,6 @@ public:
   void addPlayer(u64 id, std::string username);
   void removePlayer(u64 id);
   void setPlayerInput(u64 id, Direction direction);
+  void respawnPlayer(u64 id);
   // bool consumePlayersUpdate();
 };

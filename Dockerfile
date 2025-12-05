@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:24.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -19,7 +19,7 @@ COPY Makefile .
 
 RUN make -s all
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -36,9 +36,9 @@ RUN wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz &&
 RUN useradd -m -s /bin/bash player && \
     passwd -d player
 
-COPY --from=builder /build/bin/* /opt/arcadium/bin/
+COPY --from=builder /build/bin /opt/ssh-arcadium/bin
 
-RUN chmod 755 /opt/arcadium/bin/*
+RUN chmod -R 755 /opt/ssh-arcadium/bin
 
 RUN passwd -d root
 

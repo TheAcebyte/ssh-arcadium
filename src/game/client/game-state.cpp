@@ -32,7 +32,9 @@ void GameState::setPlayers(std::map<u64, Player> players) {
   calculateLeaderboard();
 }
 
-const std::vector<LeaderboardEntry>& GameState::getLeaderboard() const {  return leaderboard;}
+const std::vector<LeaderboardEntry> &GameState::getLeaderboard() const {
+  return leaderboard;
+}
 
 void GameState::calculateLeaderboard() {
   std::vector<LeaderboardEntry> newLeaderboard;

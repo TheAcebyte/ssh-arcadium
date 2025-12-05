@@ -21,7 +21,7 @@ enum class Color {
   TOTAL_COUNT,
 };
 
-inline constexpr Color getRandomColor() {
+inline Color getRandomColor() {
   auto index = Random::get(0UL, static_cast<st>(Color::TOTAL_COUNT) - 1);
   return static_cast<Color>(index);
 }
@@ -31,7 +31,7 @@ struct ColorPair {
   ftxui::Color body;
 };
 
-inline constexpr ColorPair getColorPair(Color color) {
+inline ColorPair getColorPair(Color color) {
   switch (color) {
   case Color::GREEN:
     return {ftxui::Color::GreenYellow, ftxui::Color::Chartreuse3};

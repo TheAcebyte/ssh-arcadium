@@ -7,6 +7,7 @@
 enum class ClientMessageType {
   PLAY,
   MOVE,
+  RESPAWN,
 };
 
 MSGPACK_ADD_ENUM(ClientMessageType);
@@ -25,4 +26,10 @@ struct MoveMessage {
   MSGPACK_DEFINE(id, direction);
 };
 
-using ClientMessage = std::variant<PlayMessage, MoveMessage>;
+struct RespawnMessage {
+  u64 id;
+
+  MSGPACK_DEFINE(id);
+};
+
+using ClientMessage = std::variant<PlayMessage, MoveMessage, RespawnMessage>;

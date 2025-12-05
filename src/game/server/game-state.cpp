@@ -32,13 +32,13 @@ void GameState::addPlayer(u64 id, std::string username) {
       .username = std::move(username),
       .status = Status::ALIVE,
       .score = 0,
-      .direction = Direction::UP,
       .color = Config::getRandomColor(),
+      .direction = Direction::UP,
   };
 
   players[id] = std::move(player);
   inputs[id] = Direction::UP;
-  spawnSnake(id);
+  spawnPlayer(id);
 }
 
 void GameState::removePlayer(u64 id) {
@@ -47,18 +47,31 @@ void GameState::removePlayer(u64 id) {
     throw std::runtime_error(error);
   }
 
-  killSnake(id);
+  killPlayer(id);
   inputs.erase(id);
   players.erase(id);
 }
 
 void GameState::setPlayerInput(u64 id, Direction input) {
-  Direction direction = players[id].direction;
+  const Player &player = players[id];
+  if (player.status == Status::DEAD) {
+    return;
+  }
+
+  Direction direction = player.direction;
   if (input == getOppositeDirection(direction)) {
     return;
   }
 
   inputs[id] = input;
+}
+
+void GameState::respawnPlayer(u64 id) {
+  if (players[id].status == Status::ALIVE) {
+    return;
+  }
+
+  spawnPlayer(id);
 }
 
 Point GameState::getRandomSnakeSpawn() {
@@ -73,7 +86,7 @@ Point GameState::getRandomSnakeSpawn() {
     }
   }
 
-  st index = Random::get(0UL, positions.size());
+  st index = Random::get(0UL, positions.size() - 1);
   return positions[index];
 }
 
@@ -89,33 +102,11 @@ Point GameState::getRandomFruitSpawn() {
     }
   }
 
-  st index = Random::get(0UL, positions.size());
+  st index = Random::get(0UL, positions.size() - 1);
   return positions[index];
 }
 
-void GameState::spawnSnake(u64 id) {
-  Snake &snake = snakes[id];
-  Point head = getRandomSnakeSpawn();
-  Point tail(head.x, head.y + 1);
-
-  snake.push_back(head);
-  snake.push_back(tail);
-  grid.setSnakeHead(head, id);
-  grid.setSnakeBody(tail, id);
-  players[id].status = Status::ALIVE;
-}
-
-void GameState::killSnake(u64 id) {
-  for (Point part : snakes[id]) {
-    grid.setEmpty(part);
-  }
-
-  snakes.erase(id);
-  players[id].status = Status::DEAD;
-  players[id].score = 0;
-}
-
-Point GameState::getNextSnakeHead(u64 id) {
+Point GameState::getNextSnakePosition(u64 id) {
   Snake &snake = snakes[id];
   Direction direction = players[id].direction;
   Point head = snake.front();
@@ -136,6 +127,27 @@ Point GameState::getNextSnakeHead(u64 id) {
   default:
     throw std::runtime_error("Invalid direction.");
   }
+}
+
+void GameState::spawnPlayer(u64 id) {
+  Snake &snake = snakes[id];
+  Point head = getRandomSnakeSpawn();
+  Point tail(head.x, head.y + 1);
+
+  snake.push_back(head);
+  snake.push_back(tail);
+  grid.setSnakeHead(head, id);
+  grid.setSnakeBody(tail, id);
+  players[id].status = Status::ALIVE;
+}
+
+void GameState::killPlayer(u64 id) {
+  snakes.erase(id);
+  players[id].status = Status::DEAD;
+  players[id].score = 0;
+  players[id].color = Config::getRandomColor();
+  players[id].direction = Direction::UP;
+  inputs[id] = Direction::UP;
 }
 
 void GameState::applyInputs() {
@@ -162,7 +174,7 @@ void GameState::spawnFruit() {
 
 void GameState::moveSnakes() {
   for (auto &[id, snake] : snakes) {
-    Point newHead = getNextSnakeHead(id);
+    Point newHead = getNextSnakePosition(id);
     snake.push_front(newHead);
   }
 }
@@ -207,7 +219,7 @@ void GameState::solveCollisions() {
   }
 
   for (u64 id : deadSnakes) {
-    killSnake(id);
+    killPlayer(id);
   }
 }
 

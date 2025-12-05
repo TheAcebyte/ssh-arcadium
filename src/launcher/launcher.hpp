@@ -3,14 +3,20 @@
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "launcher-ui.hpp"
+#include <string_view>
 
-// TODO: Run games with execvp() through some static method
+enum class LauncherGame {
+  NONE,
+  SNAKE,
+};
+
 class Launcher {
 private:
   ScreenInteractive screen = ScreenInteractive::Fullscreen();
   LauncherTab tab = LauncherTab::PROMPT;
   LauncherUI ui;
 
+  LauncherGame game = LauncherGame::NONE;
   std::string content;
   std::string username;
   void generateUsername();
@@ -20,5 +26,7 @@ private:
 
 public:
   Launcher();
+
   void run();
+  void launch();
 };

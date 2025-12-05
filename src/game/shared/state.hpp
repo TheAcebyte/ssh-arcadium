@@ -29,11 +29,11 @@ struct Player {
   u64 id;
   std::string username;
   Status status;
-  st score;
-  Direction direction;
+  u64 score;
   SnakeColor color;
+  Direction direction;
 
-  MSGPACK_DEFINE(id, username, status, score, direction, color);
+  MSGPACK_DEFINE(id, username, status, score, color, direction);
 };
 
 enum class CellType {

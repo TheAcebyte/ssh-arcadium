@@ -59,6 +59,9 @@ private:
     case ClientMessageType::MOVE:
       return payload.as<MoveMessage>();
 
+    case ClientMessageType::RESPAWN:
+      return payload.as<RespawnMessage>();
+
     default:
       throw std::runtime_error("Invalid message type.");
     }

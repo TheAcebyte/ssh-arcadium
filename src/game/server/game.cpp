@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "game/shared/client-message.hpp"
 #include "game/shared/server-message.hpp"
 #include "lib/network/event.hpp"
 #include "lib/overload.hpp"
@@ -39,23 +40,25 @@ void Game::addEventHandlers() {
 }
 
 void Game::processMessage(ClientMessage message) {
-  std::visit(Overload(
-                 [this](PlayMessage message) {
-                   state.addPlayer(message.id, message.username);
+  std::visit(
+      Overload(
+          [this](PlayMessage message) {
+            state.addPlayer(message.id, message.username);
 
-                   GridMessage grid(state.getGrid());
-                   server.send(message.id, std::move(grid));
+            GridMessage grid(state.getGrid());
+            server.send(message.id, std::move(grid));
 
-                   PlayersMessage players(state.getPlayers());
-                   server.send(message.id, std::move(players));
+            PlayersMessage players(state.getPlayers());
+            server.send(message.id, std::move(players));
 
-                   AckMessage ack(AckType::PLAY);
-                   server.send(message.id, ack);
-                 },
-                 [this](MoveMessage message) {
-                   state.setPlayerInput(message.id, message.direction);
-                 }),
-             message);
+            AckMessage ack(AckType::PLAY);
+            server.send(message.id, ack);
+          },
+          [this](MoveMessage message) {
+            state.setPlayerInput(message.id, message.direction);
+          },
+          [this](RespawnMessage message) { state.respawnPlayer(message.id); }),
+      message);
 }
 
 void Game::broadcastState() {

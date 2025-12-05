@@ -8,6 +8,8 @@
 #include "lib/types.hpp"
 #include <stdexcept>
 #include <string>
+#include <thread>
+#include <unistd.h>
 
 using namespace ftxui;
 
@@ -17,6 +19,19 @@ void Launcher::run() {
   auto component = createComponent();
   addEventHandlers(component);
   screen.Loop(component);
+}
+
+// TODO: Fix ftxui cleanup
+void Launcher::launch() {
+  if (game == LauncherGame::SNAKE) {
+    char *arguments[] = {const_cast<char *>("bin/game/client"),
+                         const_cast<char *>(username.c_str()), nullptr};
+    execvp("bin/game/client", arguments);
+  } else {
+    throw std::runtime_error("Invalid game.");
+  }
+
+  throw std::runtime_error("Failed to launch game.");
 }
 
 void Launcher::generateUsername() {
@@ -66,6 +81,17 @@ void Launcher::addEventHandlers(Component &component) {
       return event.is_character() && content.length() >= 16;
 
     case LauncherTab::MENU:
+      if (event == Event::Return) {
+        game = LauncherGame::SNAKE;
+        launch();
+        return true;
+      }
+
+      if (event == Event::Character('r')) {
+        tab = LauncherTab::PROMPT;
+        return true;
+      }
+
       if (event == Event::Character('q')) {
         screen.Exit();
         return true;

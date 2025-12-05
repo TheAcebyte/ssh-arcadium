@@ -1,5 +1,6 @@
 #include "game.hpp"
 #include "ftxui/component/component.hpp"
+#include "game/shared/client-message.hpp"
 #include "game/shared/state.hpp"
 #include "lib/text-cycler/text-cycler.hpp"
 
@@ -57,6 +58,15 @@ void Game::addInputEventHandlers(Component &component) {
     if (event == Event::Character('d')) {
       MoveMessage message(state.getId(), SnakeDirection::RIGHT);
       client.send(message);
+    }
+
+    if (event == Event::Character('r')) {
+      RespawnMessage message(state.getId());
+      client.send(message);
+    }
+
+    if (event == Event::Character('q')) {
+      screen.Exit();
     }
 
     return false;
