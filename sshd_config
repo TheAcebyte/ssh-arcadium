@@ -1,3 +1,4 @@
+Port 2222
 X11Forwarding no
 
 Match User player
